@@ -1,0 +1,78 @@
+﻿@{
+        Layout = null;
+    }
+    <!DOCTYPE html>
+    <html>
+    <head>
+
+        <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    </head>
+    <body style="font-family:Arial">
+        
+        <div class="container">
+            <table id="tblEmployee" class="table table-bordered table-condensed table-striped"  border="1"
+                   style="border-collapse:collapse; font-size:xx-large">
+                <thead class="bg-primary" >
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Gender</th>
+                        <th>Salary</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+
+            </table>
+            <div id="progress" style="display:none">
+                No more records to load
+            </div>
+        </div>
+        <script src="~/Scripts/jquery-3.4.1.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+                var currentPage = 1;
+                loadPageData(currentPage);
+               
+                $(window).scroll(function () {
+                     if(Math.floor($(window).scrollTop()) == $(document).height() - $(window).height()) {
+                      currentPage += 1;
+              
+                        loadPageData(currentPage);
+                    }
+                });
+              
+
+                function loadPageData(currentPageNumber) {
+                    $.ajax({
+                        url: '/Home/Getdata',
+                        method: 'post',
+                        dataType: "json",
+                        data: { pageNumber: currentPageNumber, pageSize: 50 },
+                        success: function (data) {
+                           
+                            var employeeTable = $('#tblEmployee tbody');
+                            if (data.length > 0) {
+                            $(data).each(function (index, emp) {
+                                employeeTable.append('<tr><td>' + emp.ID + '</td><td>'
+                                    + emp.Name + '</td><td>' + emp.Gender
+                                    + '</td><td>' + emp.Salary + '</td></tr>');
+                            });
+                            }
+                            else {
+                                $("#progress").css('display', 'block');
+                                $("#progress").css('background', 'cyan')
+                                $("#progress").css('padding', '5px')
+                                $("#progress").css('margin', '15px')
+                            }
+                        },
+                        error: function (err) {
+                            alert(err);
+                        }
+                    });
+                }
+            });
+        </script>
+    </body>
+    </html>
+
